@@ -1,5 +1,10 @@
 let keysEntries, ObjectAsArray;
 let keysCount = 0;
+let _separator;
+
+// 1MB pre-allocated
+const precomputedHeaders = Buffer.alloc(1024 * 1024 * 1024);
+let precomputedOffset = 0;
 
 function _handleObject(prefix, object) {
     for (const key in object) {
@@ -16,6 +21,8 @@ function _handleObject(prefix, object) {
                 keyId = keysCount;
                 keysCount++;
                 keysEntries[newKey] = keyId;
+                precomputedHeaders.write(newKey + _separator, precomputedOffset);
+                precomputedOffset += newKey.length + 1;
             }
 
             if (value.length) {
@@ -40,6 +47,8 @@ function handleObject(object) {
             if (keyId === undefined) {
                 keyId = (keysCount++);
                 keysEntries[key] = keyId;
+                precomputedHeaders.write(key + _separator, precomputedOffset);
+                precomputedOffset += key.length + 1;
             }
             if (value.length) {
                 ObjectAsArray[keyId] = `"${value}"`;
@@ -59,37 +68,32 @@ function handleObject(object) {
 function TransformArrayToCsv(array, separator = ',', newLine = '\n') {
     keysEntries = {};
     keysCount = 0;
+    precomputedOffset = 0;
+    _separator = separator;
     // Preprocess object (flatten + compute keys)
     array = array.map(object => handleObject(object, keysEntries));
 
     // Do headers
-    let tableEntries = 0;
-    let tableSize = 0;
-    let descriptorTable = [];
-    for (const key in keysEntries) {
-        tableEntries++;
-        tableSize += key.length;
-        descriptorTable.push(key);
-    }
-    const descriptorLine = Object.keys(keysEntries).join(separator) + newLine;
+    // const descriptorLine = Object.keys(keysEntries).join(separator) + newLine;
+    precomputedHeaders.write(newLine, precomputedOffset - 1);
+    const descriptorLine = precomputedHeaders.subarray(0, precomputedOffset).toString()
 
     // console.log(array);
 
     // Do entries now
     const body = array.map(object => object.join(separator) + separator.repeat(keysCount - object.length)).join(newLine);
 
-
     return descriptorLine + body;
 }
 
-/*
+//*
 console.log(TransformArrayToCsv([
     { a: 1 },
     { b: 2 },
     { 'c.d': 'myString' },
     { c: { d: 3, e: 4 }, f: 5 }
 ], ',', '\n'));
-*/
+//*/
 
 /*
 function ParseCsvToArray(csv, separator, newLine) {

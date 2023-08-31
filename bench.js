@@ -11,15 +11,17 @@ const smallPayload = [
 ];
 
 const bigPayload = [];
-for (let index = 0; index < 10; index++) {
+for (let index = 0; index < 100; index++) {
     smallPayload.forEach((payload) => bigPayload.push(payload));
 }
 
 const targetedPayload = bigPayload;
+/*
 console.log(toCsv42.json2csv(targetedPayload).length)
 console.log(toCsv(targetedPayload).length)
 console.log(toCsv42.json2csv(targetedPayload))
 console.log(toCsv(targetedPayload))
+*/
 const length = toCsv42.json2csv(targetedPayload).length;
 
 // add tests
