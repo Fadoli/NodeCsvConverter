@@ -1,4 +1,4 @@
-let keysEntries, flattenedObject;
+let keysEntries, ObjectAsArray;
 let keysCount = 0;
 
 function _handleObject(prefix, object) {
@@ -17,16 +17,17 @@ function _handleObject(prefix, object) {
                 keysCount++;
                 keysEntries[newKey] = keyId;
             }
+
             if (value.length) {
-                flattenedObject[keyId] = `"${value}"`;
+                ObjectAsArray[keyId] = `"${value}"`;
             } else {
-                flattenedObject[keyId] = value;
+                ObjectAsArray[keyId] = value;
             }
         }
     }
 }
 function handleObject(object) {
-    flattenedObject = {};
+    ObjectAsArray = new Array(keysCount);
     for (const key in object) {
         const value = object[key];
         if (Array.isArray(value)) {
@@ -37,18 +38,17 @@ function handleObject(object) {
         } else {
             let keyId = keysEntries[key];
             if (keyId === undefined) {
-                keyId = keysCount;
-                keysCount++;
+                keyId = (keysCount++);
                 keysEntries[key] = keyId;
             }
             if (value.length) {
-                flattenedObject[keyId] = `"${value}"`;
+                ObjectAsArray[keyId] = `"${value}"`;
             } else {
-                flattenedObject[keyId] = value;
+                ObjectAsArray[keyId] = value;
             }
         }
     }
-    return flattenedObject;
+    return ObjectAsArray;
 }
 
 /**
@@ -73,14 +73,10 @@ function TransformArrayToCsv(array, separator = ',', newLine = '\n') {
     }
     const descriptorLine = Object.keys(keysEntries).join(separator) + newLine;
 
+    // console.log(array);
+
     // Do entries now
-    const body = array.map(object => {
-        const array = [];
-        for (let i = 0; i < keysCount; i++) {
-            array.push(object[i]);
-        }
-        return array.join(separator);
-    }).join(newLine);
+    const body = array.map(object => object.join(separator) + separator.repeat(keysCount - object.length)).join(newLine);
 
 
     return descriptorLine + body;
@@ -93,7 +89,9 @@ console.log(TransformArrayToCsv([
     { 'c.d': 'myString' },
     { c: { d: 3, e: 4 }, f: 5 }
 ], ',', '\n'));
+*/
 
+/*
 function ParseCsvToArray(csv, separator, newLine) {
 
 }

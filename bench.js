@@ -11,7 +11,7 @@ const smallPayload = [
 ];
 
 const bigPayload = [];
-for (let index = 0; index < 1; index++) {
+for (let index = 0; index < 10; index++) {
     smallPayload.forEach((payload) => bigPayload.push(payload));
 }
 
