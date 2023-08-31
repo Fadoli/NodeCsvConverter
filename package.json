@@ -1,0 +1,31 @@
+{
+    "name": "@fadoli/node-csv-converter",
+    "version": "1.0.0",
+    "description": "The goal of this package is to provide an implementation of JSON to CSV convertion with as few allocation as possible",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "engines": {
+        "node": ">16"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Fadoli/NodeCsvConverter.git"
+    },
+    "keywords": [
+        "csv",
+        "convertion",
+        "nodejs"
+    ],
+    "author": "fadoli",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/Fadoli/NodeCsvConverter/issues"
+    },
+    "homepage": "https://github.com/Fadoli/NodeCsvConverter#readme",
+    "dependencies": {
+        "benchmark": "^2.1.4",
+        "csv42": "^4.0.0"
+    }
+}
