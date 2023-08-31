@@ -21,8 +21,6 @@ function _handleObject(prefix, object) {
                 keyId = keysCount;
                 keysCount++;
                 keysEntries[newKey] = keyId;
-                precomputedHeaders.write(newKey + _separator, precomputedOffset);
-                precomputedOffset += newKey.length + 1;
             }
 
             if (value.length) {
@@ -47,8 +45,6 @@ function handleObject(object) {
             if (keyId === undefined) {
                 keyId = (keysCount++);
                 keysEntries[key] = keyId;
-                precomputedHeaders.write(key + _separator, precomputedOffset);
-                precomputedOffset += key.length + 1;
             }
             if (value.length) {
                 ObjectAsArray[keyId] = `"${value}"`;
@@ -74,9 +70,9 @@ function TransformArrayToCsv(array, separator = ',', newLine = '\n') {
     array = array.map(object => handleObject(object, keysEntries));
 
     // Do headers
-    // const descriptorLine = Object.keys(keysEntries).join(separator) + newLine;
-    precomputedHeaders.write(newLine, precomputedOffset - 1);
-    const descriptorLine = precomputedHeaders.subarray(0, precomputedOffset).toString()
+    const descriptorLine = Object.keys(keysEntries).join(separator) + newLine;
+    // precomputedHeaders.write(newLine, precomputedOffset - 1);
+    // const descriptorLine = precomputedHeaders.subarray(0, precomputedOffset).toString()
 
     // console.log(array);
 
