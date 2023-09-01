@@ -1,5 +1,6 @@
 let keysEntries, ObjectAsArray;
 let keysCount = 0;
+let keyArrays;
 let _separator;
 
 // 1MB pre-allocated
@@ -10,17 +11,19 @@ function _handleObject(prefix, object) {
     for (const key in object) {
         const value = object[key];
         const newKey = `${prefix}.${key}`;
-        if (Array.isArray(value)) {
-            throw new Error("Sub arrays are not allowed !");
-        }
-        if (value && value.constructor === Object) {
+        if (value?.constructor === Object) {
+            if (Array.isArray(value)) {
+                throw new Error("Sub arrays are not allowed !");
+            }
             _handleObject(newKey, value);
         } else {
-            let keyId = keysEntries[newKey];
-            if (keyId === undefined) {
-                keyId = keysCount;
-                keysCount++;
-                keysEntries[newKey] = keyId;
+            let keyId;
+            if (!keysEntries.has(newKey)) {
+                keyId = (keysCount++);
+                keysEntries.set(newKey,keyId);
+                keyArrays.push(newKey);
+            } else {
+                keyId = keysEntries.get(newKey);
             }
 
             if (value.length) {
@@ -35,16 +38,19 @@ function handleObject(object) {
     ObjectAsArray = new Array(keysCount);
     for (const key in object) {
         const value = object[key];
-        if (Array.isArray(value)) {
-            throw new Error("Sub arrays are not allowed !");
-        }
-        if (value && value.constructor === Object) {
+        if (value?.constructor === Object) {
+            if (Array.isArray(value)) {
+                throw new Error("Sub arrays are not allowed !");
+            }
             _handleObject(key, value);
         } else {
-            let keyId = keysEntries[key];
-            if (keyId === undefined) {
+            let keyId;
+            if (!keysEntries.has(key)) {
                 keyId = (keysCount++);
-                keysEntries[key] = keyId;
+                keysEntries.set(key,keyId);
+                keyArrays.push(key);
+            } else {
+                keyId = keysEntries.get(key);
             }
             if (value.length) {
                 ObjectAsArray[keyId] = `"${value}"`;
@@ -62,15 +68,16 @@ function handleObject(object) {
  * @return {string} 
  */
 function TransformArrayToCsv(array, separator = ',', newLine = '\n') {
-    keysEntries = {};
+    keysEntries = new Map();
+    keyArrays = [];
     keysCount = 0;
     precomputedOffset = 0;
     _separator = separator;
     // Preprocess object (flatten + compute keys)
-    array = array.map(object => handleObject(object, keysEntries));
+    array = array.map(object => handleObject(object));
 
     // Do headers
-    const descriptorLine = Object.keys(keysEntries).join(separator) + newLine;
+    const descriptorLine = keyArrays.join(separator) + newLine
     // precomputedHeaders.write(newLine, precomputedOffset - 1);
     // const descriptorLine = precomputedHeaders.subarray(0, precomputedOffset).toString()
 
