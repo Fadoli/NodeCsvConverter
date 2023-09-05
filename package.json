@@ -25,7 +25,11 @@
     },
     "homepage": "https://github.com/Fadoli/NodeCsvConverter#readme",
     "dependencies": {
+        "@json2csv/plainjs": "^7.0.3",
         "benchmark": "^2.1.4",
-        "csv42": "^4.0.0"
+        "csv42": "^4.0.0",
+        "fast-csv": "^4.3.6",
+        "json-2-csv": "^4.1.0",
+        "papaparse": "^5.4.1"
     }
 }

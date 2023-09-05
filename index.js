@@ -1,6 +1,8 @@
 let keysEntries, ObjectAsArray;
 let keyArrays;
 
+const writableBuffer = require('./WritableBuffer');
+
 function _handleObject(prefix, object) {
     for (const key in object) {
         const value = object[key];
@@ -11,13 +13,12 @@ function _handleObject(prefix, object) {
             }
             _handleObject(newKey, value);
         } else {
-            let keyId;
-            if (!keysEntries.has(newKey)) {
+            let keyId = keysEntries.get(newKey);
+
+            if (keyId === undefined) {
                 keyId = keysEntries.size;
-                keysEntries.set(newKey,keyId);
+                keysEntries.set(newKey, keyId);
                 keyArrays.push(newKey);
-            } else {
-                keyId = keysEntries.get(newKey);
             }
 
             if (value.length) {
@@ -38,14 +39,14 @@ function handleObject(object) {
             }
             _handleObject(key, value);
         } else {
-            let keyId;
-            if (!keysEntries.has(key)) {
+            let keyId = keysEntries.get(key);
+
+            if (keyId === undefined) {
                 keyId = keysEntries.size;
-                keysEntries.set(key,keyId);
+                keysEntries.set(key, keyId);
                 keyArrays.push(key);
-            } else {
-                keyId = keysEntries.get(key);
             }
+
             if (value.length) {
                 ObjectAsArray[keyId] = `"${value}"`;
             } else {
@@ -80,8 +81,39 @@ function TransformArrayToCsv(array, separator = ',', newLine = '\n') {
     return descriptorLine + body;
 }
 
-//*
+
+/**
+ * @param {Array<object>} array
+ * @param {Array<object>} array
+ * @return {string} 
+ */
+function TransformArrayToCsvBuffered(array, separator = ',', newLine = '\n') {
+    const buffer = new writableBuffer();
+    keysEntries = new Map();
+    keyArrays = [];
+    precomputedOffset = 0;
+    _separator = separator;
+    // Preprocess object (flatten + compute keys)
+    array = array.map(object => handleObject(object));
+
+    // Do headers
+    buffer.write(keyArrays.join(separator) + newLine);
+
+    // Do entries now
+    array.forEach((object) => {
+        buffer.write(object.join(separator) + separator.repeat(keysEntries.size - object.length) + newLine);
+    })
+    return buffer.render();
+}
+
+/*
 console.log(TransformArrayToCsv([
+    { a: 1 },
+    { b: 2 },
+    { 'c.d': 'myString' },
+    { c: { d: 3, e: 4 }, f: 5 }
+], ',', '\n'));
+console.log(TransformArrayToCsvBuffered([
     { a: 1 },
     { b: 2 },
     { 'c.d': 'myString' },
@@ -102,4 +134,7 @@ const inputCsv = `a,b,c.d,c.e,f
 */
 
 
-module.exports = TransformArrayToCsv
+module.exports = {
+    TransformArrayToCsv,
+    TransformArrayToCsvBuffered
+}
