@@ -66,7 +66,6 @@ function TransformArrayToCsv(array, separator = ',', newLine = '\n') {
     keysEntries = new Map();
     keyArrays = [];
     precomputedOffset = 0;
-    _separator = separator;
     // Preprocess object (flatten + compute keys)
     array = array.map(object => handleObject(object));
 
@@ -76,11 +75,30 @@ function TransformArrayToCsv(array, separator = ',', newLine = '\n') {
     // console.log(array);
 
     // Do entries now
-    const body = array.map(object => object.join(separator) + separator.repeat(keysEntries.size - object.length)).join(newLine);
+    const keySize = keysEntries.size;
+    const body = array.map(object => object.join(separator) + separator.repeat(keySize - object.length)).join(newLine);
 
     return descriptorLine + body;
 }
 
+/**
+ * @param {Array<object>} array
+ * @param {Array<object>} array
+ * @return {string} 
+ */
+function TransformArrayToCsv2(array, separator = ',', newLine = '\n') {
+    keysEntries = new Map();
+    keyArrays = [];
+    precomputedOffset = 0;
+    // Preprocess object (flatten + compute keys)
+    array = array.map(object => handleObject(object));
+
+    const output = [];
+    output.push(keyArrays.join(separator));
+    const keySize = keysEntries.size;
+    output.push(array.map(object => object.join(separator) + separator.repeat(keySize - object.length)));
+    return output.join(newLine);
+}
 
 /**
  * @param {Array<object>} array
@@ -89,20 +107,36 @@ function TransformArrayToCsv(array, separator = ',', newLine = '\n') {
  */
 function TransformArrayToCsvBuffered(array, separator = ',', newLine = '\n') {
     const buffer = new writableBuffer();
+    separator = Buffer.from(separator).readInt8();
+    newLine = Buffer.from(newLine).readInt8();
     keysEntries = new Map();
     keyArrays = [];
     precomputedOffset = 0;
-    _separator = separator;
     // Preprocess object (flatten + compute keys)
     array = array.map(object => handleObject(object));
 
     // Do headers
-    buffer.write(keyArrays.join(separator) + newLine);
+    keyArrays.forEach((key) => {
+        buffer.writeStr(key);
+        buffer.writeInt8(separator);
+    })
+    buffer.remove(1);
+    buffer.writeInt8(newLine);
 
     // Do entries now
     array.forEach((object) => {
-        buffer.write(object.join(separator) + separator.repeat(keysEntries.size - object.length) + newLine);
+        object.forEach((key) => {
+            buffer.writeStr(key.toString());
+            buffer.writeInt8(separator);
+        })
+        buffer.remove(1);
+        let repeatCount = keysEntries.size - object.length;
+        while (repeatCount--) {
+            buffer.writeInt8(separator);
+        }
+        buffer.writeInt8(newLine);
     })
+
     return buffer.render();
 }
 
@@ -136,5 +170,6 @@ const inputCsv = `a,b,c.d,c.e,f
 
 module.exports = {
     TransformArrayToCsv,
-    TransformArrayToCsvBuffered
+    TransformArrayToCsv2,
+    TransformArrayToCsvBuffered: (...stuff) => Buffer.from(TransformArrayToCsv(...stuff))
 }

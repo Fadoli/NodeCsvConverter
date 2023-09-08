@@ -1,4 +1,4 @@
-const { TransformArrayToCsv: toCsv, TransformArrayToCsvBuffered: toCsvBuffered } = require('./index');
+const { TransformArrayToCsv: toCsv, TransformArrayToCsv2: toCsv2, TransformArrayToCsvBuffered: toCsvBuffered } = require('./index');
 const toCsv42 = require('csv42');
 const papaparse = require('papaparse');
 const json2csv = require('@json2csv/plainjs').Parser;
@@ -46,21 +46,26 @@ const opts = {};
 
 // add tests
 suite
-    .add('papaparse', function () {
-        papaparse.unparse(targetedPayload, { delimiter: ',', newline: '\n' });
-    })
-    .add('json-2-csv', async function () {
-        const parser = await json2csv2(targetedPayload, opts);
-    })
-    .add('@json2csv/plainjs', function () {
-        const parser = new json2csv(opts);
-        parser.parse(targetedPayload);
-    })
-    .add('csv42', function () {
-        toCsv42.json2csv(targetedPayload);
-    })
+    /*
+        .add('papaparse', function () {
+            papaparse.unparse(targetedPayload, { delimiter: ',', newline: '\n' });
+        })
+        .add('json-2-csv', async function () {
+            const parser = await json2csv2(targetedPayload, opts);
+        })
+        .add('@json2csv/plainjs', function () {
+            const parser = new json2csv(opts);
+            parser.parse(targetedPayload);
+        })
+        .add('csv42', function () {
+            toCsv42.json2csv(targetedPayload);
+        })
+        //*/
     .add('node-csv-converter', function () {
         toCsv(targetedPayload);
+    })
+    .add('node-csv-converter2', function () {
+        toCsv2(targetedPayload);
     })
     .add('node-csv-converter-buffered', function () {
         toCsvBuffered(targetedPayload);
