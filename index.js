@@ -1,8 +1,6 @@
 let keysEntries, ObjectAsArray;
 let keyArrays;
 
-const writableBuffer = require('./WritableBuffer');
-
 function _handleObject(prefix, object) {
     for (const key in object) {
         const value = object[key];
@@ -62,7 +60,7 @@ function handleObject(object) {
  * @param {Array<object>} array
  * @return {string} 
  */
-function TransformArrayToCsv(array, separator = ',', newLine = '\n') {
+function TransformArrayToCsv(array, separator = ',', newLine = '\r\n') {
     keysEntries = new Map();
     keyArrays = [];
     precomputedOffset = 0;
@@ -100,62 +98,8 @@ function TransformArrayToCsv2(array, separator = ',', newLine = '\n') {
     return output.join(newLine);
 }
 
-/**
- * @param {Array<object>} array
- * @param {Array<object>} array
- * @return {string} 
- */
-function TransformArrayToCsvBuffered(array, separator = ',', newLine = '\n') {
-    const buffer = new writableBuffer();
-    separator = Buffer.from(separator).readInt8();
-    newLine = Buffer.from(newLine).readInt8();
-    keysEntries = new Map();
-    keyArrays = [];
-    precomputedOffset = 0;
-    // Preprocess object (flatten + compute keys)
-    array = array.map(object => handleObject(object));
 
-    // Do headers
-    keyArrays.forEach((key) => {
-        buffer.writeStr(key);
-        buffer.writeInt8(separator);
-    })
-    buffer.remove(1);
-    buffer.writeInt8(newLine);
-
-    // Do entries now
-    array.forEach((object) => {
-        object.forEach((key) => {
-            buffer.writeStr(key.toString());
-            buffer.writeInt8(separator);
-        })
-        buffer.remove(1);
-        let repeatCount = keysEntries.size - object.length;
-        while (repeatCount--) {
-            buffer.writeInt8(separator);
-        }
-        buffer.writeInt8(newLine);
-    })
-
-    return buffer.render();
-}
-
-/*
-console.log(TransformArrayToCsv([
-    { a: 1 },
-    { b: 2 },
-    { 'c.d': 'myString' },
-    { c: { d: 3, e: 4 }, f: 5 }
-], ',', '\n'));
-console.log(TransformArrayToCsvBuffered([
-    { a: 1 },
-    { b: 2 },
-    { 'c.d': 'myString' },
-    { c: { d: 3, e: 4 }, f: 5 }
-], ',', '\n'));
-//*/
-
-/*
+//*
 function ParseCsvToArray(csv, separator, newLine) {
 
 }
@@ -165,7 +109,7 @@ const inputCsv = `a,b,c.d,c.e,f
 ,2,,,
 ,,myString,,
 ,,3,4,5`
-*/
+//*/
 
 
 module.exports = {
