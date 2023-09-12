@@ -1,4 +1,5 @@
-let keysEntries, ObjectAsArray;
+const keysEntries = new Map();
+let ObjectAsArray;
 let keyArrays;
 
 function _handleObject(prefix, object) {
@@ -28,7 +29,7 @@ function _handleObject(prefix, object) {
     }
 }
 function handleObject(object) {
-    ObjectAsArray = new Array(keysEntries.size);
+    ObjectAsArray = [];
     for (const key in object) {
         const value = object[key];
         if (value?.constructor === Object) {
@@ -61,7 +62,7 @@ function handleObject(object) {
  * @return {string} 
  */
 function TransformArrayToCsv(array, separator = ',', newLine = '\r\n') {
-    keysEntries = new Map();
+    keysEntries.clear();
     keyArrays = [];
     precomputedOffset = 0;
     // Preprocess object (flatten + compute keys)
@@ -85,7 +86,7 @@ function TransformArrayToCsv(array, separator = ',', newLine = '\r\n') {
  * @return {string} 
  */
 function TransformArrayToCsv2(array, separator = ',', newLine = '\n') {
-    keysEntries = new Map();
+    keysEntries.clear();
     keyArrays = [];
     precomputedOffset = 0;
     // Preprocess object (flatten + compute keys)

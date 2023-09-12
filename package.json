@@ -4,6 +4,7 @@
     "description": "The goal of this package is to provide an implementation of JSON to CSV convertion with as few allocation as possible",
     "main": "index.js",
     "scripts": {
+        "bench": "node ./bench.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "engines": {
