@@ -64,7 +64,6 @@ function handleObject(object) {
 function TransformArrayToCsv(array, separator = ',', newLine = '\r\n') {
     keysEntries.clear();
     keyArrays = [];
-    precomputedOffset = 0;
     // Preprocess object (flatten + compute keys)
     array = array.map(object => handleObject(object));
 
@@ -88,7 +87,6 @@ function TransformArrayToCsv(array, separator = ',', newLine = '\r\n') {
 function TransformArrayToCsv2(array, separator = ',', newLine = '\n') {
     keysEntries.clear();
     keyArrays = [];
-    precomputedOffset = 0;
     // Preprocess object (flatten + compute keys)
     array = array.map(object => handleObject(object));
 
