@@ -98,21 +98,54 @@ function TransformArrayToCsv2(array, separator = ',', newLine = '\n') {
 }
 
 
-//*
-function ParseCsvToArray(csv, separator, newLine) {
+/**
+ *
+ * @param {string} csv
+ * @param {Object} options
+ * @param {string} options.separator
+ * @param {string} options.newLine
+ * @param {boolean} options.filterEmptyValues
+ * @return {*} 
+ */
+function ParseCsvToArray(csv, { separator = ',', newLine = '\n', filterEmptyValues = false } = {}) {
+    const lines = csv.split(newLine);
+    const headers = lines[0].split(separator);
+    let objects = [];
+    let obj;
+    const count = lines.length - 1;
 
+    let mapField = (value, index) => obj[headers[index]] = value;
+    if (filterEmptyValues) {
+        mapField = (value, index) => {
+            if (value !== '') {
+                obj[headers[index]] = value
+            }
+        };
+    }
+
+    for (let index = 0; index < count; index++) {
+        const line = lines[index + 1];
+        objects[index] = {};
+        obj = objects[index];
+        line.split(separator).forEach(mapField)
+    }
+    return objects;
 }
 
+/*
 const inputCsv = `a,b,c.d,c.e,f
 1,,,,
 ,2,,,
 ,,myString,,
 ,,3,4,5`
+
+console.log(ParseCsvToArray(inputCsv));
 //*/
 
 
 module.exports = {
     TransformArrayToCsv,
     TransformArrayToCsv2,
-    TransformArrayToCsvBuffered: (...stuff) => Buffer.from(TransformArrayToCsv(...stuff))
+    TransformArrayToCsvBuffered: (...stuff) => Buffer.from(TransformArrayToCsv(...stuff)),
+    ParseCsvToArray
 }

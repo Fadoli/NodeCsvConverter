@@ -1,4 +1,4 @@
-const { TransformArrayToCsv: toCsv, TransformArrayToCsvBuffered: toCsvBuffered } = require('./index');
+const { TransformArrayToCsv: toCsv } = require('./index');
 
 
 /*
@@ -28,6 +28,6 @@ for (let index = 0; index < 100; index++) {
 }
 
 setInterval(() => {
-    toCsvBuffered(bigPayload);
-    toCsvBuffered(bigPayload);
+    toCsv(bigPayload);
+    toCsv(bigPayload);
 }, 1)

@@ -1,4 +1,4 @@
-const { TransformArrayToCsv: toCsv, TransformArrayToCsv2: toCsv2, TransformArrayToCsvBuffered: toCsvBuffered } = require('./index');
+const { TransformArrayToCsv: toCsv, TransformArrayToCsv2: toCsv2 } = require('./index');
 const toCsv42 = require('csv42');
 const papaparse = require('papaparse');
 const json2csv = require('@json2csv/plainjs').Parser;
@@ -66,9 +66,6 @@ suite
     })
     .add('node-csv-converter2', function () {
         toCsv2(targetedPayload);
-    })
-    .add('node-csv-converter-buffered', function () {
-        toCsvBuffered(targetedPayload);
     })
     // add listeners
     .on('cycle', function (event) {
